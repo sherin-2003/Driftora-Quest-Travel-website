@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Tours | Driftora Quest</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        .filter-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .dark .filter-section {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid transparent;
+            border-radius: 0.75rem;
+            color: #1f2937;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .dark .search-input {
+            background: rgba(30, 41, 59, 0.9);
+            color: #f1f5f9;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .filter-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid transparent;
+            border-radius: 0.75rem;
+            color: #1f2937;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%234b5563'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5em;
+        }
+        
+        .dark .filter-select {
+            background: rgba(30, 41, 59, 0.9);
+            color: #f1f5f9;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        }
+        
+        .filter-chip {
+            padding: 0.5rem 1.25rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .dark .filter-chip {
+            background: rgba(30, 41, 59, 0.5);
+            color: #cbd5e1;
+        }
+        
+        .filter-chip:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .dark .filter-chip:hover {
+            background: rgba(59, 130, 246, 0.3);
+        }
+        
+        .filter-chip.active {
+            background: white;
+            color: #3b82f6;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+        
+        .dark .filter-chip.active {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .sort-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .sort-button {
+            padding: 0.75rem 1.5rem;
+            background: white;
+            color: #4b5563;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .dark .sort-button {
+            background: #1f2937;
+            color: #d1d5db;
+            border-color: #374151;
+        }
+        
+        .sort-button:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .dark .sort-button:hover {
+            border-color: #60a5fa;
+            color: #60a5fa;
+        }
+        
+        .sort-options {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            z-index: 50;
+            display: none;
+            overflow: hidden;
+        }
+        
+        .dark .sort-options {
+            background: #1f2937;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .sort-option {
+            padding: 0.75rem 1rem;
+            color: #4b5563;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .dark .sort-option {
+            color: #d1d5db;
+            border-bottom-color: #374151;
+        }
+        
+        .sort-option:last-child {
+            border-bottom: none;
+        }
+        
+        .sort-option:hover {
+            background: #f3f4f6;
+            color: #3b82f6;
+        }
+        
+        .dark .sort-option:hover {
+            background: #374151;
+            color: #60a5fa;
+        }
+        
+        .sort-option.active {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .dark .sort-option.active {
+            background: #2563eb;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        
+        .dark .loading-spinner {
+            border-color: #374151;
+            border-top-color: #60a5fa;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="font-poppins bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-500">
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center space-x-3 group">
+                    <div class="relative">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-compass text-white"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                            Driftora<span class="font-black">Quest</span>
+                        </h1>
+                    </div>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden lg:flex items-center space-x-8">
+                    <a href="index.html" class="nav-item">Home</a>
+                    <a href="tours.html" class="nav-item active">Tours</a>
+                    <a href="about.html" class="nav-item">About</a>
+                    <a href="contact.html" class="nav-item">Contact</a>
+                </div>
+
+                <!-- Right Side -->
+                <div class="flex items-center space-x-6">
+                    <!-- Dark Mode Toggle -->
+                    <button id="themeToggle" class="theme-switch group">
+                        <div class="theme-switch-inner">
+                            <i class="fas fa-sun theme-icon-sun"></i>
+                            <i class="fas fa-moon theme-icon-moon"></i>
+                        </div>
+                        <span class="theme-switch-bg"></span>
+                    </button>
+                    
+                    <!-- CTA Button -->
+                    <a href="#filter-section" class="hidden md:inline-block px-6 py-2.5 bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
+                        <i class="fas fa-filter mr-2"></i>Filter Tours
+                    </a>
+                    
+                    <!-- Mobile Menu Button -->
+                    <button id="mobileMenuBtn" class="lg:hidden text-2xl text-gray-700 dark:text-gray-300 hover:text-blue-500 transition-colors">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="lg:hidden mt-6 hidden animate-slide-down">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-2xl">
+                    <div class="flex flex-col space-y-4">
+                        <a href="index.html" class="mobile-nav-item">
+                            <i class="fas fa-home mr-4 text-lg"></i>
+                            <span>Home</span>
+                            <i class="fas fa-chevron-right ml-auto text-blue-500"></i>
+                        </a>
+                        <a href="tours.html" class="mobile-nav-item active">
+                            <i class="fas fa-map-marked-alt mr-4 text-lg"></i>
+                            <span>Tours</span>
+                            <i class="fas fa-chevron-right ml-auto text-blue-500"></i>
+                        </a>
+                        <a href="about.html" class="mobile-nav-item">
+                            <i class="fas fa-info-circle mr-4 text-lg"></i>
+                            <span>About</span>
+                            <i class="fas fa-chevron-right ml-auto text-blue-500"></i>
+                        </a>
+                        <a href="contact.html" class="mobile-nav-item">
+                            <i class="fas fa-envelope mr-4 text-lg"></i>
+                            <span>Contact</span>
+                            <i class="fas fa-chevron-right ml-auto text-blue-500"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="pt-28 pb-16 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-gray-900 dark:to-blue-900/20">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 font-playfair">
+                <span class="text-gray-800 dark:text-white">Explore All</span>
+                <span class="text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text"> Tours</span>
+            </h1>
+            <p class="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto mb-8">
+                Discover our curated collection of premium travel experiences. Filter by destination, category, or price to find your perfect adventure.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <div class="flex items-center text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-check-circle text-emerald-500 mr-2"></i>
+                    <span>12+ Destinations</span>
+                </div>
+                <div class="flex items-center text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-check-circle text-emerald-500 mr-2"></i>
+                    <span>Flexible Booking</span>
+                </div>
+                <div class="flex items-center text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-check-circle text-emerald-500 mr-2"></i>
+                    <span>24/7 Support</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section id="filter-section" class="filter-section py-12">
+        <div class="container mx-auto px-6">
+            <div class="bg-white/10 dark:bg-gray-800/30 backdrop-blur-lg rounded-2xl p-8 shadow-2xl">
+                <!-- Search Bar -->
+                <div class="relative mb-8">
+                    <div class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <input type="text" 
+                           id="searchInput" 
+                           placeholder="Search tours by name, destination, or category..." 
+                           class="search-input">
+                </div>
+                
+                <!-- Filter Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Destination Filter -->
+                    <div>
+                        <label class="block text-white mb-3 font-semibold">
+                            <i class="fas fa-globe-americas mr-2"></i>Destination
+                        </label>
+                        <select id="destinationFilter" class="filter-select">
+                            <option value="all">All Destinations</option>
+                            <option value="europe">Europe</option>
+                            <option value="asia">Asia</option>
+                            <option value="america">America</option>
+                            <option value="australia">Australia & Oceania</option>
+                            <option value="africa">Africa</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Price Filter -->
+                    <div>
+                        <label class="block text-white mb-3 font-semibold">
+                            <i class="fas fa-tag mr-2"></i>Price Range
+                        </label>
+                        <select id="priceFilter" class="filter-select">
+                            <option value="all">Any Price</option>
+                            <option value="1000">Under $1000</option>
+                            <option value="2000">Under $2000</option>
+                            <option value="3000">Under $3000</option>
+                            <option value="5000">Under $5000</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Duration Filter -->
+                    <div>
+                        <label class="block text-white mb-3 font-semibold">
+                            <i class="fas fa-clock mr-2"></i>Duration
+                        </label>
+                        <select id="durationFilter" class="filter-select">
+                            <option value="all">Any Duration</option>
+                            <option value="1-3">1-3 Days</option>
+                            <option value="4-7">4-7 Days</option>
+                            <option value="8-14">8-14 Days</option>
+                            <option value="15+">15+ Days</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Category Filter Chips -->
+                <div class="mb-8">
+                    <label class="block text-white mb-4 font-semibold">
+                        <i class="fas fa-filter mr-2"></i>Tour Categories
+                    </label>
+                    <div class="flex flex-wrap gap-3">
+                        <div class="filter-chip active" data-filter="all">All Tours</div>
+                        <div class="filter-chip" data-filter="adventure">Adventure</div>
+                        <div class="filter-chip" data-filter="luxury">Luxury</div>
+                        <div class="filter-chip" data-filter="beach">Beach</div>
+                        <div class="filter-chip" data-filter="mountain">Mountain</div>
+                        <div class="filter-chip" data-filter="culture">Culture</div>
+                        <div class="filter-chip" data-filter="food">Food & Wine</div>
+                        <div class="filter-chip" data-filter="wildlife">Wildlife</div>
+                    </div>
+                </div>
+                
+                <!-- Sort and Reset -->
+                <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                    <!-- Sort Dropdown -->
+                    <div class="sort-dropdown">
+                        <button class="sort-button" id="sortButton">
+                            <i class="fas fa-sort-amount-down"></i>
+                            <span>Sort by: Featured</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="sort-options" id="sortOptions">
+                            <div class="sort-option active" data-sort="featured">Featured</div>
+                            <div class="sort-option" data-sort="price-low">Price: Low to High</div>
+                            <div class="sort-option" data-sort="price-high">Price: High to Low</div>
+                            <div class="sort-option" data-sort="rating">Highest Rated</div>
+                            <div class="sort-option" data-sort="duration">Shortest Duration</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Reset and Count -->
+                    <div class="flex items-center gap-6">
+                        <span id="tourCount" class="text-white font-semibold">
+                            Loading tours...
+                        </span>
+                        <button id="resetFilters" class="px-5 py-2.5 bg-white/20 hover:bg-white/30 text-white rounded-lg font-semibold transition-all duration-300 flex items-center gap-2">
+                            <i class="fas fa-redo-alt"></i>
+                            Reset Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tours Grid Section -->
+    <section class="py-16 bg-gray-50 dark:bg-gray-900">
+        <div class="container mx-auto px-6">
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="text-center py-12">
+                <div class="loading-spinner"></div>
+                <p class="text-gray-600 dark:text-gray-300 mt-4">Loading amazing tours...</p>
+            </div>
+            
+            <!-- Tours Grid -->
+            <div id="toursContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Tours will be dynamically loaded here -->
+            </div>
+            
+            <!-- No Results Message -->
+            <div id="noResults" class="hidden text-center py-16">
+                <div class="max-w-md mx-auto">
+                    <div class="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-compass text-5xl text-blue-500"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800 dark:text-white">No Tours Found</h3>
+                    <p class="text-gray-600 dark:text-gray-300 mb-8">
+                        We couldn't find any tours matching your criteria. Try adjusting your filters or search term.
+                    </p>
+                    <button id="resetNoResults" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity">
+                        <i class="fas fa-redo-alt mr-2"></i>
+                        Reset All Filters
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Load More Button -->
+            <div id="loadMoreContainer" class="text-center mt-12 hidden">
+                <button id="loadMoreBtn" class="px-8 py-3 bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300">
+                    <i class="fas fa-sync-alt mr-2"></i>
+                    Load More Tours
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section class="py-20 bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6 font-playfair">
+                    <span class="text-gray-800 dark:text-white">Why Choose</span>
+                    <span class="text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text"> Driftora Quest</span>
+                </h2>
+                <p class="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
+                    We're committed to creating unforgettable travel experiences with premium service and attention to detail.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon-bg"></div>
+                        <i class="fas fa-award feature-icon"></i>
+                    </div>
+                    <h3 class="feature-title">Award-Winning Service</h3>
+                    <p class="feature-description">
+                        Recognized for excellence in customer service and travel innovation by leading industry organizations.
+                    </p>
+                </div>
+                
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon-bg"></div>
+                        <i class="fas fa-user-shield feature-icon"></i>
+                    </div>
+                    <h3 class="feature-title">Expert Local Guides</h3>
+                    <p class="feature-description">
+                        Our carefully selected local guides provide authentic insights and ensure your safety throughout the journey.
+                    </p>
+                </div>
+                
+                <div class="feature-box">
+                    <div class="feature-icon-wrapper">
+                        <div class="feature-icon-bg"></div>
+                        <i class="fas fa-heart feature-icon"></i>
+                    </div>
+                    <h3 class="feature-title">Personalized Experiences</h3>
+                    <p class="feature-description">
+                        Every tour is customizable to match your preferences, interests, and travel style.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 bg-white dark:bg-gray-800">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6 font-playfair">
+                    <span class="text-gray-800 dark:text-white">Frequently Asked</span>
+                    <span class="text-transparent bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text"> Questions</span>
+                </h2>
+            </div>
+            
+            <div class="max-w-3xl mx-auto">
+                <div class="space-y-6">
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>What is your cancellation policy?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>We offer flexible cancellation policies. Most tours can be cancelled up to 30 days before departure for a full refund. Some premium experiences may have different terms, which will be clearly stated during booking.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Do you offer travel insurance?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Yes, we offer comprehensive travel insurance through our trusted partners. You can add insurance during the booking process or contact our support team for customized coverage options.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <button class="faq-question">
+                            <span>Can I customize my tour?</span>
+                            <i class="fas fa-chevron-down faq-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Absolutely! We specialize in creating personalized travel experiences. Contact our travel experts to discuss customization options for any tour in our collection.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-16 pb-10">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+                <!-- Company Info -->
+                <div>
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-compass text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold">Driftora<span class="text-blue-400">Quest</span></h3>
+                    </div>
+                    <p class="text-gray-400 mb-6 leading-relaxed">
+                        Creating unforgettable travel experiences since 2023. We believe in journeys that transform.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="social-icon-footer">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-icon-footer">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-icon-footer">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-icon-footer">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-bold mb-6 text-blue-400">Quick Links</h4>
+                    <ul class="space-y-3">
+                        <li><a href="index.html" class="footer-link">Home</a></li>
+                        <li><a href="tours.html" class="footer-link">All Tours</a></li>
+                        <li><a href="about.html" class="footer-link">About Us</a></li>
+                        <li><a href="contact.html" class="footer-link">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Destinations -->
+                <div>
+                    <h4 class="text-lg font-bold mb-6 text-blue-400">Destinations</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="footer-link">Europe Tours</a></li>
+                        <li><a href="#" class="footer-link">Asia Tours</a></li>
+                        <li><a href="#" class="footer-link">America Tours</a></li>
+                        <li><a href="#" class="footer-link">Australia Tours</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Newsletter -->
+                <div>
+                    <h4 class="text-lg font-bold mb-6 text-blue-400">Stay Updated</h4>
+                    <p class="text-gray-400 mb-4">Subscribe for exclusive deals and travel inspiration.</p>
+                    <div class="relative">
+                        <input type="email" placeholder="Your email" class="w-full px-4 py-3 bg-gray-800 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button class="absolute right-2 top-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-md transition-colors">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Divider -->
+            <div class="border-t border-gray-800 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-500 text-center md:text-left mb-4 md:mb-0">
+                        &copy; 2023 Driftora Quest. All rights reserved.
+                    </p>
+                    <div class="flex space-x-6">
+                        <a href="#" class="text-gray-500 hover:text-blue-400 transition-colors">Privacy Policy</a>
+                        <a href="#" class="text-gray-500 hover:text-blue-400 transition-colors">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal-elegant">
+        <div class="modal-content-elegant">
+            <div class="modal-header-elegant">
+                <h3 class="modal-title-elegant">
+                    <i class="fas fa-calendar-check mr-3 text-blue-500"></i>
+                    Book Your Tour
+                </h3>
+                <button id="closeModal" class="modal-close-elegant">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body-elegant">
+                <p class="text-gray-600 dark:text-gray-300 mb-6">
+                    You're booking: <span id="selectedTour" class="font-bold text-blue-600 dark:text-blue-400"></span>
+                </p>
+                
+                <form id="bookingForm" class="space-y-6">
+                    <div class="form-group-elegant">
+                        <label class="form-label-elegant">
+                            <i class="fas fa-user mr-2"></i>Full Name
+                        </label>
+                        <input type="text" class="form-input-elegant" placeholder="Enter your full name" required>
+                    </div>
+                    
+                    <div class="form-group-elegant">
+                        <label class="form-label-elegant">
+                            <i class="fas fa-envelope mr-2"></i>Email Address
+                        </label>
+                        <input type="email" class="form-input-elegant" placeholder="Enter your email" required>
+                    </div>
+                    
+                    <div class="form-group-elegant">
+                        <label class="form-label-elegant">
+                            <i class="fas fa-calendar-alt mr-2"></i>Travel Date
+                        </label>
+                        <input type="date" class="form-input-elegant" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit-elegant">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        Confirm Booking
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/darkmode.js"></script>
+    <script src="js/filter.js"></script>
+    <script src="js/main.js"></script>
+    
+    <script>
+        // FAQ Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    const answer = this.nextElementSibling;
+                    const icon = this.querySelector('.faq-icon');
+                    
+                    // Toggle answer visibility
+                    if (answer.style.maxHeight) {
+                        answer.style.maxHeight = null;
+                        answer.style.paddingTop = '0';
+                        icon.classList.remove('rotate-180');
+                    } else {
+                        answer.style.maxHeight = answer.scrollHeight + 'px';
+                        answer.style.paddingTop = '1rem';
+                        icon.classList.add('rotate-180');
+                    }
+                    
+                    // Close other FAQ items
+                    faqQuestions.forEach(otherQuestion => {
+                        if (otherQuestion !== this) {
+                            const otherAnswer = otherQuestion.nextElementSibling;
+                            const otherIcon = otherQuestion.querySelector('.faq-icon');
+                            otherAnswer.style.maxHeight = null;
+                            otherAnswer.style.paddingTop = '0';
+                            otherIcon.classList.remove('rotate-180');
+                        }
+                    });
+                });
+            });
+            
+            // Open first FAQ by default
+            if (faqQuestions.length > 0) {
+                faqQuestions[0].click();
+            }
+            
+            // Sort dropdown functionality
+            const sortButton = document.getElementById('sortButton');
+            const sortOptions = document.getElementById('sortOptions');
+            const sortOptionButtons = document.querySelectorAll('.sort-option');
+            
+            if (sortButton && sortOptions) {
+                sortButton.addEventListener('click', function() {
+                    sortOptions.style.display = sortOptions.style.display === 'block' ? 'none' : 'block';
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!sortButton.contains(event.target) && !sortOptions.contains(event.target)) {
+                        sortOptions.style.display = 'none';
+                    }
+                });
+                
+                // Handle sort option selection
+                sortOptionButtons.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const sortValue = this.getAttribute('data-sort');
+                        const sortText = this.textContent;
+                        
+                        // Update button text
+                        sortButton.querySelector('span').textContent = `Sort by: ${sortText.split(': ')[1] || sortText}`;
+                        
+                        // Update active state
+                        sortOptionButtons.forEach(opt => opt.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Close dropdown
+                        sortOptions.style.display = 'none';
+                        
+                        // Trigger filter (this will be handled by filter.js)
+                        window.currentSort = sortValue;
+                        if (typeof window.filterTours === 'function') {
+                            window.filterTours();
+                        }
+                    });
+                });
+            }
+            
+            // Reset no results button
+            const resetNoResults = document.getElementById('resetNoResults');
+            if (resetNoResults) {
+                resetNoResults.addEventListener('click', function() {
+                    const resetButton = document.getElementById('resetFilters');
+                    if (resetButton) {
+                        resetButton.click();
+                    }
+                });
+            }
+        });
+        
+        // Add FAQ styles
+        const faqStyles = document.createElement('style');
+        faqStyles.textContent = `
+            .faq-item {
+                border: 2px solid #e5e7eb;
+                border-radius: 1rem;
+                overflow: hidden;
+                transition: all 0.3s ease;
+            }
+            
+            .dark .faq-item {
+                border-color: #374151;
+            }
+            
+            .faq-question {
+                width: 100%;
+                padding: 1.5rem;
+                background: transparent;
+                border: none;
+                text-align: left;
+                font-size: 1.125rem;
+                font-weight: 600;
+                color: #1f2937;
+                cursor: pointer;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                transition: all 0.3s ease;
+            }
+            
+            .dark .faq-question {
+                color: #f9fafb;
+            }
+            
+            .faq-question:hover {
+                background: #f9fafb;
+            }
+            
+            .dark .faq-question:hover {
+                background: #374151;
+            }
+            
+            .faq-icon {
+                transition: transform 0.3s ease;
+            }
+            
+            .faq-answer {
+                max-height: 0;
+                overflow: hidden;
+                padding: 0 1.5rem;
+                color: #4b5563;
+                transition: all 0.3s ease;
+            }
+            
+            .dark .faq-answer {
+                color: #d1d5db;
+            }
+            
+            .rotate-180 {
+                transform: rotate(180deg);
+            }
+        `;
+        document.head.appendChild(faqStyles);
+    </script>
+</body>
+</html>
